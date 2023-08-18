@@ -11,7 +11,10 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
 ]
 
-CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
+
+CSRF_FAILURE_VIEW = 'pages.views.csrf_failure'
 
 MEDIA_ROOT = BASE_DIR / 'media' 
 

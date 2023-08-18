@@ -11,7 +11,7 @@ from blog.models import Category, Post
 User = get_user_model()
 
 
-class PostsListView(ListView):
+class IndexView(ListView):
     model = Post
 
     template_name = "blog/index.html"
@@ -46,21 +46,35 @@ def post_detail(request, id):
     return render(request, template, context)
 
 
-def category_posts(request, category_slug):
-    template = 'blog/category.html'
+class CategoryListView(ListView):
+    model = Post
 
-    category = get_object_or_404(
-        Category.objects.filter(
-            is_published=True,
-        ), slug=category_slug
-    )
-    post_list = get_list_or_404(
-        Post.published.all().filter(category__slug=category_slug)
-        # Post.published.published().filter(category__slug=category_slug)
-    )
-    context = {
-        'category': category,
-        'post_list': post_list
-    }
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['post_list'] = (
+            self.object.posts.select_related('category')
+        )
+        return context
 
-    return render(request, template, context)
+    template_name = "blog/category.html"
+    paginate_by = 10
+
+
+# def category_posts(request, category_slug):
+#     template = 'blog/category.html'
+
+#     category = get_object_or_404(
+#         Category.objects.filter(
+#             is_published=True,
+#         ), slug=category_slug
+#     )
+#     post_list = get_list_or_404(
+#         Post.published.all().filter(category__slug=category_slug)
+#         # Post.published.published().filter(category__slug=category_slug)
+#     )
+#     context = {
+#         'category': category,
+#         'post_list': post_list
+#     }
+
+#     return render(request, template, context)
