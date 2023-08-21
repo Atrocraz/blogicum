@@ -33,7 +33,7 @@ class PostManager(models.Manager):
             is_published=True,
             pub_date__lt=datetime.now(),
             category__is_published=True
-        )
+        ).annotate(comment_count=models.Count('comments'))
 
     # def published(self):
     #     return self.get_queryset().published()

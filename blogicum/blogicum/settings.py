@@ -14,6 +14,8 @@ ALLOWED_HOSTS = [
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 
+LOGIN_REDIRECT_URL = 'blog:index'
+
 CSRF_FAILURE_VIEW = 'pages.views.csrf_failure'
 
 MEDIA_ROOT = BASE_DIR / 'media' 
