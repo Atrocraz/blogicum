@@ -1,11 +1,10 @@
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from blog.models import Comment
 
 
-class CommentBaseClass(LoginRequiredMixin):
+class CommentBaseClass:
     model = Comment
     template_name = 'blog/comment.html'
     pk_url_kwarg = 'comment_id'

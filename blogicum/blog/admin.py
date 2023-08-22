@@ -1,13 +1,9 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from .models import Category, Location, Post
+
+from blog.models import Category, Location, Post, Comment
 
 admin.site.empty_value_display = 'Не задано'
-
-
-class PostInLine(admin.TabularInline):
-    model = Post
-    extra = 0
 
 
 @admin.register(Post)
@@ -70,3 +66,12 @@ class LocationAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
     list_display_links = ('name',)
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = (
+        'text',
+    )
+    search_fields = ('author_id', 'post_id',)
+    list_display_links = ('author_id',)

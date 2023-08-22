@@ -1,35 +1,24 @@
-# birthday/forms.py
 from django import forms
-from django.contrib.auth import get_user_model
-from .models import Post, Comment
-from django.contrib.auth.forms import UserChangeForm
 
-User = get_user_model()
+from blog.models import Post, Comment, User
 
 
 class PostCreateForm(forms.ModelForm):
+
     class Meta:
         model = Post
-        exclude = ('author', 'is_published')
+        exclude = ('author', 'created_at', 'id')
 
 
-class UserEditForm(UserChangeForm):
+class UserEditForm(forms.ModelForm):
+
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'username', 'email',)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields.pop('password')
-
-
-class PostEditForm(forms.ModelForm):
-    class Meta:
-        model = Post
-        exclude = ('id', 'created_at', 'author_id', 'is_published')
-
 
 class CommentForm(forms.ModelForm):
+
     class Meta:
         model = Comment
         fields = ('text',)

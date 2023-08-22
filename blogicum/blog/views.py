@@ -15,7 +15,7 @@ from django.urls import reverse_lazy
 from datetime import datetime
 import pytz
 from blog.models import Category, Post
-from blog.forms import UserEditForm, PostCreateForm, PostEditForm, CommentForm
+from blog.forms import UserEditForm, PostCreateForm, CommentForm
 from core.classes import CommentBaseClass
 
 
@@ -71,7 +71,7 @@ def post_detail(request, id):
 
 class PostUpdateView(LoginRequiredMixin, UpdateView):
     model = Post
-    form_class = PostEditForm
+    form_class = PostCreateForm
     template_name = 'blog/create.html'
     slug_url_kwarg = 'id'
     slug_field = 'id'
@@ -191,9 +191,9 @@ def add_comment(request, id):
     return redirect('blog:post_detail', id=id)
 
 
-class CommentUpdateView(CommentBaseClass, UpdateView):
+class CommentUpdateView(LoginRequiredMixin, CommentBaseClass, UpdateView):
     form_class = CommentForm
 
 
-class CommentDeleteView(CommentBaseClass, DeleteView):
+class CommentDeleteView(LoginRequiredMixin, CommentBaseClass, DeleteView):
     pass

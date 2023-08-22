@@ -9,6 +9,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
+    'atrocraz.pythonanywhere.com',
+    'www.atrocraz.pythonanywhere.com'
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
