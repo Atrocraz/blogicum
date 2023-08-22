@@ -1,7 +1,7 @@
 # birthday/forms.py
 from django import forms
 from django.contrib.auth import get_user_model
-from .models import Post
+from .models import Post, Comment
 from django.contrib.auth.forms import UserChangeForm
 
 User = get_user_model()
@@ -10,7 +10,7 @@ User = get_user_model()
 class PostCreateForm(forms.ModelForm):
     class Meta:
         model = Post
-        exclude = ('author',)
+        exclude = ('author', 'is_published')
 
 
 class UserEditForm(UserChangeForm):
@@ -26,4 +26,10 @@ class UserEditForm(UserChangeForm):
 class PostEditForm(forms.ModelForm):
     class Meta:
         model = Post
-        exclude = ('id', 'created_at', 'author_id', )
+        exclude = ('id', 'created_at', 'author_id', 'is_published')
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('text',)

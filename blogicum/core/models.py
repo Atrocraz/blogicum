@@ -15,25 +15,13 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-# https://docs.djangoproject.com/en/4.2/topics/db/managers/#modifying-a-manager-s-initial-queryset
-
-# class PostQuerySet(models.QuerySet):
-#     def published(self):
-#         return self.filter(
-#             is_published=True,
-#             pub_date__lt=datetime.now(),
-#             category__is_published=True
-#         )
-
 
 class PostManager(models.Manager):
     def get_queryset(self):
-        # return PostQuerySet(self.model, using=self._db)
         return super().get_queryset().filter(
             is_published=True,
             pub_date__lt=datetime.now(),
             category__is_published=True
-        ).annotate(comment_count=models.Count('comments'))
-
-    # def published(self):
-    #     return self.get_queryset().published()
+        ).annotate(
+            comment_count=models.Count('comments')
+        ).order_by('-pub_date')
