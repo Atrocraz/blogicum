@@ -14,7 +14,7 @@ from django.views.generic import (
 from django.urls import reverse_lazy
 from datetime import datetime
 import pytz
-from blog.models import Category, Post, Comment
+from blog.models import Category, Post
 from blog.forms import UserEditForm, PostCreateForm, PostEditForm, CommentForm
 from core.classes import CommentBaseClass
 
@@ -28,7 +28,7 @@ class IndexView(ListView):
     paginate_by = 10
 
     def get_queryset(self) -> QuerySet[Any]:
-        return Post.published.all() 
+        return Post.published.all()
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -54,9 +54,9 @@ def post_detail(request, id):
         Post.objects.all().select_related('category', 'location')
         .filter(pk=id)
     )
-    if (post.is_published is False or
-        post.category.is_published is False or
-            post.pub_date > pytz.UTC.localize(datetime.now())):
+    if (post.is_published is False
+        or post.category.is_published is False
+            or post.pub_date > pytz.UTC.localize(datetime.now())):
         if post.author != request.user:
             raise Http404
 
@@ -64,7 +64,7 @@ def post_detail(request, id):
         'post': post,
         'form': CommentForm(),
         'comments': post.comments.select_related('author')
-        }
+    }
 
     return render(request, template, context)
 
