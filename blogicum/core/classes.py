@@ -21,6 +21,7 @@ class CommentBaseClass:
             kwargs={'id': self.kwargs.get("id")}
         )
 
+
 class PostEditDeleteClass:
     model = Post
     template_name = 'blog/create.html'

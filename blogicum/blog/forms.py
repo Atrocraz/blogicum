@@ -9,12 +9,11 @@ class PostCreateForm(forms.ModelForm):
         model = Post
         exclude = ('author', 'created_at', 'id')
         widgets = {
-            'pub_date': forms.DateTimeInput(format='%Y-%m-%d %H:%M:%S', attrs={'class':'datetimefield'}),
+            'pub_date': forms.DateTimeInput(
+                format='%Y-%m-%d %H:%M:%S',
+                attrs={'class': 'datetimefield'}
+            ),
         }
-
-        # widgets = {
-        #     'pub_date': forms.DateTimeInput(attrs={'type': 'date'})
-        # }
 
 
 class UserEditForm(forms.ModelForm):
@@ -25,7 +24,9 @@ class UserEditForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
-    text = forms.CharField(widget=forms.Textarea(attrs={'cols': 10, 'rows': 5}))
+    text = forms.CharField(
+        widget=forms.Textarea(attrs={'cols': 10, 'rows': 5})
+    )
 
     class Meta:
         model = Comment

@@ -7,7 +7,7 @@ from django.db.models.query import QuerySet
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import (
-    CreateView, DeleteView, DetailView, ListView, UpdateView
+    CreateView, DeleteView, ListView, UpdateView
 )
 from django.utils import timezone
 from django.urls import reverse_lazy
@@ -70,7 +70,7 @@ class PostUpdateView(LoginRequiredMixin, PostEditDeleteClass, UpdateView):
 
 class PostDeleteView(LoginRequiredMixin, PostEditDeleteClass, DeleteView):
     login_url = '/auth/login/'
-    
+
     def get_success_url(self):
         return reverse_lazy(
             'blog:profile',

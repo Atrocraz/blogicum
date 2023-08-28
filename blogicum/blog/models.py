@@ -22,7 +22,7 @@ class Category(BasePublishedModel):
     class Meta:
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
-        
+
     def __str__(self):
         return self.title[0:30]
 
@@ -80,7 +80,7 @@ class Post(BasePublishedModel):
         default_related_name = 'posts'
 
     def get_absolute_url(self):
-        return reverse('blog:post_detail', kwargs={'id' : self.id})
+        return reverse('blog:post_detail', kwargs={'id': self.id})
 
     def __str__(self):
         return self.title[0:30]
