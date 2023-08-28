@@ -72,6 +72,7 @@ class LocationAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     list_display = (
         'text',
+        'author'
     )
-    search_fields = ('author_id', 'post_id',)
-    list_display_links = ('author_id',)
+    search_fields = ('author', 'post_id',)
+    list_display_links = ('author',)

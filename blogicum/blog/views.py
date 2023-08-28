@@ -1,25 +1,20 @@
 from typing import Any, Dict
-from django.contrib.auth import get_user_model
+
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.paginator import Paginator
 from django.db import models
 from django.db.models.query import QuerySet
 from django.http import Http404
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import (
     CreateView, DeleteView, DetailView, ListView, UpdateView
 )
+from django.utils import timezone
 from django.urls import reverse_lazy
-from datetime import datetime
-import pytz
-from blog.models import Category, Post
+
+from blog.models import Category, Post, User
 from blog.forms import UserEditForm, PostCreateForm, CommentForm
-from core.classes import CommentBaseClass
-
-
-User = get_user_model()
+from core.classes import CommentBaseClass, PostEditDeleteClass
 
 
 class IndexView(ListView):
@@ -56,9 +51,8 @@ def post_detail(request, id):
     )
     if (post.is_published is False
         or post.category.is_published is False
-            or post.pub_date > pytz.UTC.localize(datetime.now())):
-        if post.author != request.user:
-            raise Http404
+            or post.pub_date > timezone.now()) and post.author != request.user:
+        raise Http404
 
     context = {
         'post': post,
@@ -69,39 +63,14 @@ def post_detail(request, id):
     return render(request, template, context)
 
 
-class PostUpdateView(LoginRequiredMixin, UpdateView):
-    model = Post
+class PostUpdateView(LoginRequiredMixin, PostEditDeleteClass, UpdateView):
+    login_url = '/auth/login/'
     form_class = PostCreateForm
-    template_name = 'blog/create.html'
-    slug_url_kwarg = 'id'
-    slug_field = 'id'
-
-    def dispatch(self, request, *args, **kwargs):
-        instance = get_object_or_404(Post, id=kwargs['id'])
-        if instance.author != request.user:
-            return redirect('blog:post_detail', id=kwargs['id'])
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_success_url(self):
-        return reverse_lazy(
-            'blog:post_detail',
-            kwargs={'id': self.kwargs.get("id")}
-        )
 
 
-class PostDeleteView(LoginRequiredMixin, DeleteView):
-    model = Post
-    template_name = 'blog/create.html'
-    slug_url_kwarg = 'id'
-    slug_field = 'id'
-
-    def dispatch(self, request, *args, **kwargs):
-        instance = get_object_or_404(Post, id=kwargs['id'])
-        if instance.author != request.user:
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
-
+class PostDeleteView(LoginRequiredMixin, PostEditDeleteClass, DeleteView):
+    login_url = '/auth/login/'
+    
     def get_success_url(self):
         return reverse_lazy(
             'blog:profile',
@@ -109,23 +78,26 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
         )
 
 
-class ProfileDetailView(DetailView):
+class ProfileDetailView(ListView):
     model = User
+
     template_name = "blog/profile.html"
-    slug_url_kwarg = 'username'
-    slug_field = 'username'
-    сontext_object_name = 'profile'
+    paginate_by = 10
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         author = get_object_or_404(User, username=self.kwargs['username'])
-        page_num = self.request.GET.get('page')
+        context['profile'] = author
+        return context
+
+    def get_queryset(self) -> QuerySet[Any]:
         post_list = ''
+        author = get_object_or_404(User, username=self.kwargs['username'])
 
         if author != self.request.user:
             post_list = Post.published.all().filter(
                 author=author,
-                pub_date__lte=pytz.UTC.localize(datetime.now())
+                pub_date__lte=timezone.now()
             )
 
         else:
@@ -135,10 +107,7 @@ class ProfileDetailView(DetailView):
                 comment_count=models.Count('comments')
             ).order_by('-pub_date')
 
-        paginator = Paginator(post_list, 10)
-        context['page_obj'] = paginator.get_page(page_num)
-        context['profile'] = author
-        return context
+        return post_list
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
@@ -148,12 +117,8 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     slug_url_kwarg = 'username'
     slug_field = 'username'
 
-    def dispatch(self, request, *args, **kwargs):
-        instance = get_object_or_404(User, username=kwargs['username'])
-        print(instance.username)
-        if instance != request.user:
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
+    def get_object(self):
+        return get_object_or_404(User, id=self.request.user.id)
 
     def get_success_url(self):
         return reverse_lazy(
@@ -167,6 +132,16 @@ class CategoryListView(ListView):
 
     template_name = "blog/category.html"
     paginate_by = 10
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        category = get_object_or_404(
+            Category,
+            slug=self.kwargs['category_slug'],
+            is_published=True
+        )
+        context['category'] = category
+        return context
 
     def get_queryset(self) -> QuerySet[Any]:
         category = get_object_or_404(

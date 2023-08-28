@@ -1,7 +1,7 @@
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from blog.models import Comment
+from blog.models import Comment, Post
 
 
 class CommentBaseClass:
@@ -20,3 +20,14 @@ class CommentBaseClass:
             'blog:post_detail',
             kwargs={'id': self.kwargs.get("id")}
         )
+
+class PostEditDeleteClass:
+    model = Post
+    template_name = 'blog/create.html'
+    pk_url_kwarg = 'id'
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.get_object().author != request.user:
+            return redirect('blog:post_detail', id=kwargs['id'])
+
+        return super().dispatch(request, *args, **kwargs)

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.urls import reverse
 
 from core.models import BasePublishedModel, PostManager
 
@@ -21,9 +22,9 @@ class Category(BasePublishedModel):
     class Meta:
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
-
+        
     def __str__(self):
-        return self.title
+        return self.title[0:30]
 
 
 class Location(BasePublishedModel):
@@ -34,7 +35,7 @@ class Location(BasePublishedModel):
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
-        return self.name
+        return self.name[0:30]
 
 
 class Post(BasePublishedModel):
@@ -78,8 +79,11 @@ class Post(BasePublishedModel):
         ordering = ('-pub_date',)
         default_related_name = 'posts'
 
+    def get_absolute_url(self):
+        return reverse('blog:post_detail', kwargs={'id' : self.id})
+
     def __str__(self):
-        return self.title
+        return self.title[0:30]
 
 
 class Comment(models.Model):
@@ -104,4 +108,4 @@ class Comment(models.Model):
         ordering = ('created_at',)
 
     def __str__(self):
-        return self.text
+        return f'Автор комментария {self.author}, пост {self.post}'
