@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
 from django.db.models.query import QuerySet
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import (
     CreateView, DeleteView, ListView, UpdateView
 )
@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.urls import reverse
 
 from blog.models import Category, Post, User
-from blog.forms import PostCreateForm, CommentForm, UserEditForm
+from blog.forms import CommentForm, PostCreateForm, UserEditForm
 from core.classes import CommentBaseClass, PostEditDeleteClass
 
 
@@ -111,7 +111,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     slug_field = 'username'
 
     def get_object(self):
-        return get_object_or_404(User, id=self.request.user.id)
+        return self.request.user
 
     def get_success_url(self):
         return reverse(
