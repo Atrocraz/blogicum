@@ -111,7 +111,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     slug_field = 'username'
 
     def get_object(self):
-        return self.request.user.id
+        return get_object_or_404(User, id=self.request.user.id)
 
     def get_success_url(self):
         return reverse(
