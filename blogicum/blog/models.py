@@ -6,6 +6,8 @@ from core.models import BasePublishedModel, PostManager
 
 User = get_user_model()
 
+MAX_TITLE_LEN = 30
+
 
 class Category(BasePublishedModel):
     title = models.CharField(max_length=256, verbose_name='Заголовок')
@@ -24,7 +26,7 @@ class Category(BasePublishedModel):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.title[0:30]
+        return self.title[:MAX_TITLE_LEN]
 
 
 class Location(BasePublishedModel):
@@ -35,7 +37,7 @@ class Location(BasePublishedModel):
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
-        return self.name[0:30]
+        return self.name[:MAX_TITLE_LEN]
 
 
 class Post(BasePublishedModel):
@@ -46,8 +48,10 @@ class Post(BasePublishedModel):
     text = models.TextField('Текст')
     pub_date = models.DateTimeField(
         'Дата и время публикации',
-        help_text='Если установить дату и время в будущем — '
-                  'можно делать отложенные публикации.'
+        help_text=(
+            'Если установить дату и время в будущем — '
+            'можно делать отложенные публикации.'
+        )
     )
 
     author = models.ForeignKey(
@@ -83,7 +87,7 @@ class Post(BasePublishedModel):
         return reverse('blog:post_detail', kwargs={'id': self.id})
 
     def __str__(self):
-        return self.title[0:30]
+        return self.title[:MAX_TITLE_LEN]
 
 
 class Comment(models.Model):
@@ -108,4 +112,6 @@ class Comment(models.Model):
         ordering = ('created_at',)
 
     def __str__(self):
-        return f'Автор комментария {self.author}, пост {self.post}'
+        return (f'Пост № {self.post.id}, '
+                'комментарий пользователя {self.author}, '
+                'текст {self.post[:10]}')

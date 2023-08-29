@@ -22,6 +22,8 @@ CSRF_FAILURE_VIEW = 'pages.views.csrf_failure'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
+LOGIN_URL = '/auth/login/'
+
 INSTALLED_APPS = [
     'blog.apps.BlogConfig',
     'pages.apps.PagesConfig',

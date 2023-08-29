@@ -1,5 +1,6 @@
 from django.contrib import admin
-from django.utils.safestring import mark_safe
+# from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 from blog.models import Category, Location, Post, Comment
 
@@ -11,7 +12,8 @@ class PostAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'title',
-        'short_image',
+        # 'short_image',
+        'image_tag',
         'pub_date',
         'author',
         'location',
@@ -28,14 +30,21 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ('category',)
     list_display_links = ('title',)
 
-    # По какой-то причине не работает, не смог разобраться
-    # Url передаёт верно, но картинки всё равно нет
-    @admin.display(description='Изображение')
-    def short_image(self, obj):
+    def image_tag(self, obj):
         if obj.image:
-            return mark_safe(
-                f'<img scr="{obj.image.url}" width="80" height="60">'
+            return format_html(
+                '<img src="{}" width="80" height="60" />'.format(obj.image.url)
             )
+
+    image_tag.short_description = 'Изображение'
+    # Вариант выше работает отлично
+    # Этот код оставил тут закомментированным, чтобы разобраться позднее
+    # @admin.display(description='Изображение')
+    # def short_image(self, obj):
+    #     if obj.image:
+    #         return mark_safe(
+    #             f'<img scr="{obj.image.url}" width="80" height="60">'
+    #         )
 
 
 @admin.register(Category)

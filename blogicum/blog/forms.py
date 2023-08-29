@@ -1,13 +1,13 @@
 from django import forms
 
-from blog.models import Post, Comment, User
+from blog.models import Comment, Post, User
 
 
 class PostCreateForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        exclude = ('author', 'created_at', 'id')
+        exclude = ('author',)
         widgets = {
             'pub_date': forms.DateTimeInput(
                 format='%Y-%m-%d %H:%M:%S',

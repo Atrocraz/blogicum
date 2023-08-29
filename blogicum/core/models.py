@@ -26,4 +26,6 @@ class PostManager(models.Manager):
             category__is_published=True
         ).annotate(
             comment_count=models.Count('comments')
-        ).order_by('-pub_date')
+        ).order_by(
+            '-pub_date'
+        ).prefetch_related('location', 'category', 'author')
